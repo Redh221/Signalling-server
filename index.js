@@ -6,6 +6,3 @@ const webSocketPort = 8090;
 
 wss.init(webSocketPort);
 // app.listen(HTTP_Port, "0.0.0.0", () => {
-app.listen(HTTP_Port, () => {
-  console.log("Server listening on port ", HTTP_Port);
-});
