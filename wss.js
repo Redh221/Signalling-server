@@ -1,17 +1,3 @@
-const WebSocket = require("ws");
-
-const init = (port) => {
-  console.log("WebSocket server init");
-  const wss = new WebSocket.Server({ port });
-
-  wss.on("connection", (socket) => {
-    console.log("Client has been connected");
-    socket.on("error", console.error);
-    socket.on("message", (message) => onMessage(wss, socket, message));
-    socket.on("close", (message) => onClose(wss, socket, message));
-  });
-};
-
 const channels = {};
 
 const send = (wsClient, type, body) => {
@@ -45,12 +31,10 @@ const onMessage = (wss, socket, message) => {
       break;
     }
     case "send_offer": {
-      console.log("offer_received");
       const { sdp } = body;
       const userNames = Object.keys(channels[channelName]);
       userNames.forEach((uName) => {
         if (uName !== userName) {
-          // Send offer to all other users in the channel
           const wsClient = channels[channelName][uName];
           send(wsClient, "offer_sdp_received", { sdp, from: userName });
         }
@@ -62,7 +46,6 @@ const onMessage = (wss, socket, message) => {
       const userNames = Object.keys(channels[channelName]);
       userNames.forEach((uName) => {
         if (uName !== userName) {
-          // Send answer to the user who sent the offer
           const wsClient = channels[channelName][uName];
           send(wsClient, "answer_sdp_received", { sdp, from: userName });
         }
@@ -74,7 +57,6 @@ const onMessage = (wss, socket, message) => {
       const userNames = Object.keys(channels[channelName]);
       userNames.forEach((uName) => {
         if (uName !== userName) {
-          // Forward the ICE candidate to all other users
           const wsClient = channels[channelName][uName];
           send(wsClient, "ice_candidate_received", {
             candidate,
@@ -98,10 +80,18 @@ const onClose = (wss, socket, message) => {
       }
     });
 
-    // Remove channel if empty
     if (Object.keys(channels[channelName]).length === 0) {
       delete channels[channelName];
     }
+  });
+};
+
+const init = (wssServer) => {
+  wssServer.on("connection", (socket) => {
+    console.log("Client has been connected");
+    socket.on("error", console.error);
+    socket.on("message", (message) => onMessage(wssServer, socket, message));
+    socket.on("close", (message) => onClose(wssServer, socket, message));
   });
 };
 
