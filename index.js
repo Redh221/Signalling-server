@@ -30,6 +30,32 @@ const wssServer = new WebSocket.Server({
 // Инициализация WebSocket
 wss.init(wssServer);
 
+// Логирование подключений
+wssServer.on("connection", (ws, req) => {
+  const clientIp = req.connection.remoteAddress;
+  const timestamp = new Date().toISOString();
+
+  console.log(`[${timestamp}] WebSocket подключение от ${clientIp}`);
+
+  // Пример отправки сообщения клиенту при подключении
+  ws.send("Вы подключены к WebSocket серверу");
+
+  // Логируем каждое сообщение от клиента
+  ws.on("message", (message) => {
+    console.log(`[${timestamp}] Получено сообщение от ${clientIp}: ${message}`);
+  });
+
+  // Логируем закрытие соединения
+  ws.on("close", () => {
+    console.log(`[${timestamp}] Соединение с ${clientIp} закрыто`);
+  });
+
+  // Логируем ошибки
+  ws.on("error", (error) => {
+    console.error(`[${timestamp}] Ошибка с WebSocket от ${clientIp}:`, error);
+  });
+});
+
 app.get("/", (req, res) => {
   res.send("Hello, World!"); // Ваш основной роут
 });
