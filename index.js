@@ -30,29 +30,24 @@ const wssServer = new WebSocket.Server({
 // Инициализация WebSocket
 wss.init(wssServer);
 
-// Логирование подключений
+// Логирование подключения клиента
 wssServer.on("connection", (ws, req) => {
-  const clientIp = req.connection.remoteAddress;
-  const timestamp = new Date().toISOString();
+  console.log(
+    `[${new Date().toISOString()}] WebSocket подключение от ${
+      req.connection.remoteAddress
+    }`
+  );
 
-  console.log(`[${timestamp}] WebSocket подключение от ${clientIp}`);
-
-  // Пример отправки сообщения клиенту при подключении
-  ws.send("Вы подключены к WebSocket серверу");
-
-  // Логируем каждое сообщение от клиента
   ws.on("message", (message) => {
-    console.log(`[${timestamp}] Получено сообщение от ${clientIp}: ${message}`);
+    console.log(`Получено сообщение: ${message}`);
   });
 
-  // Логируем закрытие соединения
   ws.on("close", () => {
-    console.log(`[${timestamp}] Соединение с ${clientIp} закрыто`);
+    console.log(`Подключение закрыто: ${req.connection.remoteAddress}`);
   });
 
-  // Логируем ошибки
   ws.on("error", (error) => {
-    console.error(`[${timestamp}] Ошибка с WebSocket от ${clientIp}:`, error);
+    console.error("Ошибка WebSocket:", error);
   });
 });
 
@@ -68,13 +63,5 @@ server.listen(HTTP_Port, () => {
 
 // Обработка ошибок на WebSocket сервере
 wssServer.on("error", (error) => {
-  console.error("WebSocket error:", error);
-});
-
-// Важно: для WebSocket серверов через upgrade, нужно обработать событие upgrade
-server.on("upgrade", (request, socket, head) => {
-  // Обработка подключения WebSocket через HTTP сервер
-  wssServer.handleUpgrade(request, socket, head, (ws) => {
-    wssServer.emit("connection", ws, request);
-  });
+  console.error("Ошибка WebSocket сервера:", error);
 });
