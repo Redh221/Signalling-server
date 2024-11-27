@@ -1,5 +1,7 @@
 const express = require("express");
 const WebSocket = require("ws");
+const https = require("https");
+const fs = require("fs");
 const wss = require("./wss");
 
 const app = express();
@@ -7,19 +9,37 @@ const app = express();
 const HTTP_Port = 4000; // HTTP сервер на 4000 порту
 const webSocketPort = 8090; // WebSocket сервер на 8090 порту
 
-app.get("/", (req, res) => {
-  res.send("Hello, World!");
-});
+// Загрузка SSL сертификатов для HTTPS
+const options = {
+  cert: fs.readFileSync(
+    "/etc/letsencrypt/live/signal-server.waterhedgehog.com/fullchain.pem"
+  ),
+  key: fs.readFileSync(
+    "/etc/letsencrypt/live/signal-server.waterhedgehog.com/privkey.pem"
+  ),
+};
 
-// Настроим WebSocket сервер на порту 8090
-const wssServer = new WebSocket.Server({ port: webSocketPort });
+// Создаем HTTPS сервер
+const server = https.createServer(options, app);
+
+// Настроим WebSocket сервер через HTTPS (SSL)
+const wssServer = new WebSocket.Server({ server, path: "/ws" });
 
 // Инициализация WebSocket
 wss.init(wssServer);
 
+app.get("/", (req, res) => {
+  res.send("Hello, World!");
+});
+
 // Запуск HTTP сервера на порту 4000
-const server = app.listen(HTTP_Port, () => {
-  console.log(`Express сервер работает на http://localhost:${HTTP_Port}/`);
+server.listen(HTTP_Port, () => {
+  console.log(`Express сервер работает на https://localhost:${HTTP_Port}/`);
+  console.log("WebSocket сервер работает на https://localhost:8090/ws/");
+});
+
+wssServer.on("error", (error) => {
+  console.error("WebSocket error:", error);
 });
 
 // Важно: для WebSocket серверов через upgrade, нужно обработать событие upgrade
