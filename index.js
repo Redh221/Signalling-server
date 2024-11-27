@@ -22,22 +22,26 @@ const options = {
 // Создаем HTTPS сервер
 const server = https.createServer(options, app);
 
-// Настроим WebSocket сервер через HTTPS (SSL)
-const wssServer = new WebSocket.Server({ server, path: "/ws" });
+// Настроим WebSocket сервер через HTTPS (WSS)
+const wssServer = new WebSocket.Server({
+  server,
+  path: "/ws", // Пропишем путь для WebSocket
+});
 
 // Инициализация WebSocket
 wss.init(wssServer);
 
 app.get("/", (req, res) => {
-  res.send("Hello, World!");
+  res.send("Hello, World!"); // Ваш основной роут
 });
 
-// Запуск HTTP сервера на порту 4000
+// Запуск HTTPS сервера
 server.listen(HTTP_Port, () => {
   console.log(`Express сервер работает на https://localhost:${HTTP_Port}/`);
-  console.log("WebSocket сервер работает на https://localhost:8090/ws/");
+  console.log("WebSocket сервер работает на wss://localhost:8090/ws/");
 });
 
+// Обработка ошибок на WebSocket сервере
 wssServer.on("error", (error) => {
   console.error("WebSocket error:", error);
 });
