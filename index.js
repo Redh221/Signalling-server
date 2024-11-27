@@ -6,8 +6,7 @@ const wss = require("./wss");
 
 const app = express();
 
-const HTTP_Port = 4000; // HTTP сервер на 4000 порту
-const webSocketPort = 8090; // WebSocket сервер на 8090 порту
+const HTTP_Port = 4000; // Сервер на порту 4000
 
 // Загрузка SSL сертификатов для HTTPS
 const options = {
@@ -24,8 +23,8 @@ const server = https.createServer(options, app);
 
 // Настроим WebSocket сервер через HTTPS (WSS)
 const wssServer = new WebSocket.Server({
-  server,
-  path: "/ws", // Пропишем путь для WebSocket
+  server, // Указываем, что WebSocket сервер будет использовать тот же сервер
+  path: "/ws", // Путь для WebSocket
 });
 
 // Инициализация WebSocket
@@ -38,7 +37,7 @@ app.get("/", (req, res) => {
 // Запуск HTTPS сервера
 server.listen(HTTP_Port, () => {
   console.log(`Express сервер работает на https://localhost:${HTTP_Port}/`);
-  console.log("WebSocket сервер работает на wss://localhost:8090/ws/");
+  console.log("WebSocket сервер работает на wss://localhost:4000/ws/");
 });
 
 // Обработка ошибок на WebSocket сервере
