@@ -28,6 +28,21 @@ const io = new Server(server, {
 });
 
 wss.init(io);
+io.on('connection', (socket) => {
+  console.log(`[${new Date().toISOString()}] Клиент подключен: ${socket.id} с IP ${socket.handshake.address}`);
+
+  socket.on('message', (message) => {
+    console.log(`Получено сообщение от ${socket.id}: ${message}`);
+  });
+
+  socket.on('disconnect', () => {
+    console.log(`[${new Date().toISOString()}] Клиент отключен: ${socket.id}`);
+  });
+
+  socket.on('error', (error) => {
+    console.error(`Ошибка сокета от ${socket.id}:`, error);
+  });
+});
 
 app.get("/", (req, res) => {
   res.send("Hello, World!");
