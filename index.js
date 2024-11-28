@@ -16,13 +16,19 @@ const options = {
   ),
 };
 
+// Middleware для логирования всех запросов
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} request for ${req.url}`);
+  next();
+});
+
 const server = https.createServer(options, app);
 
 // Настройки Socket.io с path и CORS
 const io = new Server(server, {
   path: "/ws", // Путь для WebSocket соединений
   cors: {
-    origin: '*', // Разрешаем все источники. Лучше настроить конкретные домены.
+    origin: "*", // Разрешаем все источники. Лучше настроить конкретные домены.
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type"], // Разрешаем определенные заголовки
   },
@@ -33,23 +39,20 @@ wss.init(io);
 
 // Обработка соединений через Socket.io
 io.on('connection', (socket) => {
-  console.log(`[${new Date().toISOString()}] Клиент подключен: ${socket.id} с IP ${socket.handshake.address}`);
+  const clientIp = socket.handshake.address || "null"; // IP клиента
+  console.log(`[${new Date().toISOString()}] Клиент подключен: ${socket.id} с IP ${clientIp}`);
 
-  // Получение сообщений от клиента
   socket.on('message', (message) => {
-    console.log(`Получено сообщение от ${socket.id}: ${message}`);
-    // Можно отправить ответ клиенту
+    console.log(`[${new Date().toISOString()}] Получено сообщение от ${socket.id}: ${message}`);
     socket.emit('response', `Принято сообщение: ${message}`);
   });
 
-  // Обработка отключений
   socket.on('disconnect', () => {
     console.log(`[${new Date().toISOString()}] Клиент отключен: ${socket.id}`);
   });
 
-  // Обработка ошибок сокета
   socket.on('error', (error) => {
-    console.error(`Ошибка сокета от ${socket.id}:`, error);
+    console.error(`[${new Date().toISOString()}] Ошибка сокета от ${socket.id}:`, error);
   });
 });
 
@@ -58,8 +61,8 @@ app.get("/", (req, res) => {
   res.send("Hello, World!");
 });
 
-// Запуск сервера
-server.listen(HTTP_Port, () => {
-  console.log(`Express сервер работает на https://localhost:${HTTP_Port}/`);
-  console.log("Socket.io сервер работает на wss://localhost:4000/ws/");
+// Запуск сервера на всех интерфейсах (0.0.0.0)
+server.listen(HTTP_Port, '0.0.0.0', () => {
+  console.log(`[${new Date().toISOString()}] Express сервер работает на https://0.0.0.0:${HTTP_Port}/`);
+  console.log(`[${new Date().toISOString()}] Socket.io сервер работает на wss://0.0.0.0:4000/ws/`);
 });
