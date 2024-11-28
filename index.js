@@ -17,10 +17,7 @@ const options = {
 };
 
 // Middleware для настройки CSP (разрешение подключения к WebSocket)
-app.use((req, res, next) => {
-  res.setHeader("Content-Security-Policy", "connect-src 'self' wss://signal-server.waterhedgehog.com:4000");
-  next();
-});
+
 
 // Middleware для логирования всех запросов
 app.use((req, res, next) => {
