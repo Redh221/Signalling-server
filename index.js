@@ -19,7 +19,7 @@ const io = new Server(server, {
   cors: {
     origin: "*", // Разрешаем все источники. Лучше настроить конкретные домены.
     methods: ["GET", "POST"],
-    allowedHeaders: ["Content-Type"], // Разрешаем определенные заголовки
+    allowedHeaders: "*", // Разрешаем определенные заголовки
   },
 });
 
@@ -62,7 +62,7 @@ app.get("/", (req, res) => {
 });
 
 // Запуск сервера на всех интерфейсах (0.0.0.0)
-server.listen(8080, "127.0.0.1", () => {
+server.listen(8080, () => {
   console.log(
     `[${new Date().toISOString()}] Express сервер работает на https://0.0.0.0:8080/`
   );
