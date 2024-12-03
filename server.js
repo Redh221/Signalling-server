@@ -31,6 +31,7 @@ const init = () => {
     socket.on("error", console.error);
 
     socket.on("join", (body) => {
+      console.log(`join event recived ${body.channelName} ${body.userName}`);
       const { channelName, userName } = body;
 
       if (!channels[channelName]) {
