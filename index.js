@@ -14,7 +14,7 @@ app.use((req, res, next) => {
 });
 
 // Настройки Socket.io с path и CORS
-const io = new Server(server, {
+const io = new socketIo(server, {
   cors: {
     origin: "*", // Разрешаем все источники. Лучше настроить конкретные домены.
     methods: ["GET", "POST"],
