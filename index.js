@@ -1,6 +1,7 @@
 const express = require("express");
 const http = require("http"); // Импортируем http, а не https
 const socketIo = require("socket.io");
+const { Server } = require("socket.io");
 const wss = require("./wss");
 
 const app = express();
@@ -14,7 +15,7 @@ app.use((req, res, next) => {
 });
 
 // Настройки Socket.io с path и CORS
-const io = new Server(socketIo, {
+const io = new Server(server, {
   cors: {
     origin: "*", // Разрешаем все источники. Лучше настроить конкретные домены.
     methods: ["GET", "POST"],
