@@ -20,6 +20,7 @@ const io = new Server(server, {
     origin: "*", // Разрешаем все источники. Лучше настроить конкретные домены.
     methods: ["GET", "POST"],
     allowedHeaders: "*", // Разрешаем определенные заголовки
+    credentials: true, // Разрешить передачу cookies (если нужно)
   },
 });
 
