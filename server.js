@@ -29,9 +29,13 @@ const init = () => {
   io.on("connection", (socket) => {
     console.log("Client has been connected");
     socket.on("error", console.error);
+    socket.onAny((event, ...args) => {
+      console.log(
+        `Event received: ${event}, with args: ${JSON.stringify(args)}`
+      );
+    });
 
     socket.on("join", (body) => {
-      console.log(`join event recived ${body.channelName} ${body.userName}`);
       const { channelName, userName } = body;
 
       if (!channels[channelName]) {
