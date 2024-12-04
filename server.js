@@ -34,6 +34,10 @@ const init = () => {
         `Event received: ${event}, with args: ${JSON.stringify(args)}`
       );
     });
+    socket.on("chat message", (data) => {
+      // Отправка полученного сообщения всем клиентам
+      io.emit("chat message", data);
+    });
 
     socket.on("join", (body) => {
       const { channelName, userName } = body;
